@@ -1,0 +1,33 @@
+Mongoose => Object Data Modeling (ODM) for MongoDB
+
+majorly for schema and model
+
+methods are 
+save(),
+create(),
+findone(),
+findmany(),
+findbyId(),
+exec() => it is a optional function and returns a promise. It’s better to use this function since it will prevent some head-scratching issues
+deleteOne(),
+deleteMany(),
+
+validation methods:
+exists()
+// Instead of using a standard find method
+const blogFind = await Blog.findOne({ author: "Jesse Hall" });
+
+// Use the equivalent where() method
+const blogWhere = await Blog.where("author").equals("Jesse Hall");
+console.log(blogWhere)
+
+
+defining schemas,
+default: boolean,
+immutable:boolean,
+lowercase:boolean,
+required:boolean
+
+where(), select()
+const blog = await Blog.where("author").equals("Jesse Hall").select("title author")
+console.log(blog)
