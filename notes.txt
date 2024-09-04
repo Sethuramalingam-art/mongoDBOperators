@@ -31,3 +31,59 @@ required:boolean
 where(), select()
 const blog = await Blog.where("author").equals("Jesse Hall").select("title author")
 console.log(blog)
+
+MongoDB views
+//create a new RedactedUser View on a User Model 
+autocreate and autoindex flag should be false when creating mongodb views 
+ You can also create a View using createCollection().
+
+const userSchema = new Schema({
+  name:String,
+  email:String,
+  roles:[String]
+}).{autoCreate:false, autoIndex:false})
+
+const User=mongoose.model('user', userSchema);
+const RedactedUser = mongoose.model('RedactedUser', userSchema);
+
+await User.createCollection();
+//create a view
+await RedactedUser.createCollection();
+
+await RedactedUser.createCollection({
+  viewOn: 'users', // Set `viewOn` to the collection name, **not** model name.
+  pipeline: [
+    {
+      $set: {
+        name: { $concat: [{ $substr: ['$name', 0, 3] }, '...'] },
+        email: { $concat: [{ $substr: ['$email', 0, 3] }, '...'] }
+      }
+    }
+  ]
+});
+
+await User.create([
+  { name: 'John Smith', email: 'john.smith@gmail.com', roles: ['user'] },
+  { name: 'Bill James', email: 'bill@acme.co', roles: ['user', 'admin'] }
+]);
+
+// [{ _id: ..., name: 'Bil...', email: 'bil...', roles: ['user', 'admin'] }]
+console.log(await RedactedUser.find({ roles: 'admin' }));
+
+Mongoose calls the document's validate() method before saving.
+
+Populated paths are no longer set to their original _id their value is replaced with the mongoose document returned from the database by performing a separate query before returning the results.
+
+const story = await Story.
+  findOne({ title: 'Casino Royale' }).
+  populate('author').
+  exec();
+// prints "The author is Ian Fleming"
+console.log('The author is %s', story.author.name);
+
+await Person.findOne({'name':'sethu'}, 'name id');
+
+
+sorting
+await Person.find().sort({ age: -1 }); // returns age starting from 10 as the first entry
+await Person.find().sort({ age: 1 }); // returns age starting from 0 as the first entry
