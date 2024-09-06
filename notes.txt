@@ -87,3 +87,25 @@ await Person.findOne({'name':'sethu'}, 'name id');
 sorting
 await Person.find().sort({ age: -1 }); // returns age starting from 10 as the first entry
 await Person.find().sort({ age: 1 }); // returns age starting from 0 as the first entry
+
+count documents
+User.countDocuments({age:{$gte:5}}, function (err, count) {
+    if (err){
+        console.log(err)
+    }else{
+        console.log("Count :", count)
+    }
+});
+
+upsert
+Using the upsert option, you can use findOneAndUpdate() as a find-and-upsert operation. An upsert behaves like a normal findOneAndUpdate() if it finds a document that matches filter. But, if no document matches filter, MongoDB will insert one by combining filter and update as shown below.
+const filter = {name:'xxx'}
+const update = {age:29}
+await Character.countDocuments(filter)
+const doc = await Character.findOneAndUpdate(filter, update, {
+  new: true,
+  upsert: true // Make this update into an upsert
+});
+doc.name; // Will Riker
+doc.age; // 29
+
